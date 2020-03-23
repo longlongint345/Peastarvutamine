@@ -115,6 +115,10 @@ public class Tehe {
     public String getTehe() {
         return tehe;
     }
+
+    public double getVastus() {
+        return vastus;
+    }
 }
 
 enum Tehtetuup {

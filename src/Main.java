@@ -49,7 +49,7 @@ public class Main {
 
             int raskusaste, suvaline = 1;
             char reziim;
-            boolean vastusOige = true;
+            boolean vastusOige = true, uus_katse = false;
             System.out.print("Sisestage soovitud raskusaste (0 - välju programmist, 1 - ühekohalised, 2 - kahekohalisd, jne (max 6): ");
             raskusaste = sc.nextInt();
             if (raskusaste == 0) break;
@@ -63,28 +63,39 @@ public class Main {
 
             while (true) {
                 try {
+
                     if (reziim == 'l') {
                         if (vastusOige) suvaline = loos(2); // valib kumb tehe kuvada
-                        if (suvaline == 1) vastusOige = teostaTehe(liitmine, vastusOige);
-                        else vastusOige = teostaTehe(lahutamine, vastusOige);
+                        if (suvaline == 1) vastusOige = teostaTehe(liitmine, vastusOige, uus_katse);
+                        else vastusOige = teostaTehe(lahutamine, vastusOige, uus_katse);
 
                     } else if (reziim == 'j') {
                         if (vastusOige) suvaline = loos(4);
                         switch (suvaline) {
                             case 1:
-                                vastusOige = teostaTehe(liitmine, vastusOige);
+                                vastusOige = teostaTehe(liitmine, vastusOige, uus_katse);
                                 break;
                             case 2:
-                                vastusOige = teostaTehe(lahutamine, vastusOige);
+                                vastusOige = teostaTehe(lahutamine, vastusOige, uus_katse);
                                 break;
                             case 3:
-                                vastusOige = teostaTehe(korrutamine, vastusOige);
+                                vastusOige = teostaTehe(korrutamine, vastusOige, uus_katse);
                                 break;
                             case 4:
-                                vastusOige = teostaTehe(jagamine, vastusOige);
+                                vastusOige = teostaTehe(jagamine, vastusOige, uus_katse);
                                 break;
                         }
                     }
+
+                    if (!vastusOige) {
+                        System.out.println("Uuesti proovimiseks sisesta 1, loobumiseks 0");
+                        if (sc.nextInt() == 0) {
+                            uus_katse = false;
+                        } else {
+                            uus_katse = true;
+                        }
+                    }
+
                 } catch (InputMismatchException e) {
                     System.out.println();
                     break;
@@ -94,14 +105,18 @@ public class Main {
         }
     }
 
-    private static boolean teostaTehe(Tehe tehe, boolean korrektne) throws InputMismatchException {
-        // Antud tehteobjekt ja boolean, mis näitab, kas eelmine teostatud tehe oli õigesti vastatud
+    private static boolean teostaTehe(Tehe tehe, boolean korrektne, boolean uus_katse) throws InputMismatchException {
+        // Antud tehteobjekt ja boolean, mis näitab, kas eelmine teostatud tehe oli õigesti vastatud,
+        // boolean uus_katse, mis näitab kas kasutaja soovib uut katset
         // Tulemus: Kuvab kasutajale vastamiseks tehte, arvestades eelmise tulemust
         // Tagastab true kui kasutaja pakutav vastus on õige
         // Kui eelmine tehe oli vale, kuvab selle uuesti
-        // todo Lisada võimalus õige vastus kuvada, kui kasutaja seda välja ei mõtle
         Scanner sc = new Scanner(System.in);
         if (korrektne) tehe.genTehe();
+        else if (!uus_katse) {
+            System.out.println("Õige vastus oleks olnud: " + tehe.getVastus());
+            tehe.genTehe();
+        }
         System.out.print(tehe.getTehe());
         if (!tehe.kontrolliVastus(sc.nextDouble())) {
             System.out.println("Vale vastus!");

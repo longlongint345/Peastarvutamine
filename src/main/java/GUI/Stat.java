@@ -1,98 +1,87 @@
 package GUI;
 
 import java.io.*;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Stat {
     private statistikaTuup tuup;
     private String file;
-    private int toevaartus;
-    private List<Long> vaheajad = new ArrayList<>();
+    private long aeg;
+    private File stats;
 
     public Stat(statistikaTuup tuup, String file) {
         this.tuup = tuup;
         this.file = file;
+        this.stats = new File(file);
     }
 
-    public void setToevaartus(int toevaartus) {
-        this.toevaartus = toevaartus;
+    public void setAeg(long aeg){
+        this.aeg = aeg;
     }
 
-    public void lisaAndmed() throws IOException {
+    public void lisaAndmed(boolean õige) throws IOException {
         switch (this.tuup) {
-            // kui on IOException siis võib .close() kasutades fail jääda sulgemata
             case HEADJAVEAD:
-                try (FileWriter stat1 = new FileWriter(file, true)) {
+                String[] andmed;
+                double kokku = 0;
+                int n = 0;
+                try (Scanner sc = new Scanner(stats)) {
+                   while (sc.hasNextLine()) {
+                       andmed = sc.nextLine().split(" ");
+                       kokku = Double.parseDouble(andmed[0]);
+                       n = Integer.parseInt(andmed[1]);
+                   }
+                }
+                try (FileWriter stat1 = new FileWriter(stats)) {
                     try (BufferedWriter statHJV = new BufferedWriter(stat1)) {
-                        statHJV.write(String.valueOf(toevaartus));
-                        statHJV.newLine();
+                        if (õige) {
+                            kokku++; n++;
+                        } else {
+                            kokku++;
+                        }
+                        statHJV.write(kokku+" "+n);
                     }
                 }
                 break;
+
             case AJAKULU:
-                try (FileWriter stat2 = new FileWriter(file, true)) {
+                kokku = 0;
+                n = 0;
+                try (Scanner sc = new Scanner(stats)) {
+                    while (sc.hasNextLine()) {
+                        andmed = sc.nextLine().split(" ");
+                        kokku = Double.parseDouble(andmed[0]);
+                        n = Integer.parseInt(andmed[1]);
+                    }
+                }
+                try (FileWriter stat2 = new FileWriter(stats)) {
                     try (BufferedWriter statAK = new BufferedWriter(stat2)) {
-                        statAK.write(String.valueOf(arvutaAeg(vaheajad)));
-                        vaheajad.clear();
-                        statAK.newLine();
+                        if (kokku == 0 && n == 0) {
+                            statAK.write(aeg+" "+(n+1));
+                            break;
+                        }
+                        if (õige) {
+                            statAK.write(((kokku * n + aeg)/(n+1))+" "+(n+1));
+                        } else {
+                            statAK.write((kokku * n + aeg)/(n)+" "+n);
+                        }
                     }
                 }
                 break;
         }
     }
 
-    public void loeStatistikat() throws IOException {
-        File statistika = new File(file);
-        List<Integer> vastused = new ArrayList<>();
-        try (Scanner sc = new Scanner(statistika)) {
-            double oiged = 0;
+    public double[] loeStatistikat() throws IOException {
+        double[] andmed = new double[2];
+        try (Scanner sc = new Scanner(stats)) {
             while (sc.hasNextLine()) {
-                int x = Integer.parseInt(sc.nextLine());
-                if (x == 1) {
-                    oiged++;
-                }
-                vastused.add(x);
+                String[] andmejupid = sc.nextLine().split(" ");
+                andmed[0] = Double.parseDouble(andmejupid[0]);
+                andmed[1] = Double.parseDouble(andmejupid[1]);
             }
-            System.out.println("Kõigist vastuste arvust " + vastused.size() + " on õigesti vastatud " + (int) oiged + " korda" +
-                    " ja valesti " + (int) (vastused.size() - oiged) + " korda.");
-            if (vastused.size() > 0)
-                System.out.println("Oled seni vastanud " + (Math.round(oiged / vastused.size() * 100)) + "%-lise täpsusega.");
-            System.out.println();
         }
-    }
 
-    public void loeAjakuluStatistikat() throws IOException {
-        DecimalFormat df = new DecimalFormat("0.##");
-        File statistika = new File(file);
-        double vastused = 0;
-        try (Scanner sc = new Scanner(statistika)) {
-            int n = 0;
-            while (sc.hasNextLine()) {
-                vastused += Double.parseDouble(sc.nextLine());
-                n++;
-            }
-            System.out.println("Kokku on ühe tehte arvutamiseks kulunud aega keskmiselt " + df.format(vastused / n / 1000) + " sekundit.");
-        }
-    }
-
-
-    public void liidaAeg(long vaheaeg) {
-        vaheajad.add(vaheaeg);
-    }
-
-    private long arvutaAeg(List<Long> vaheajad) {
-        long koguAeg = 0;
-        if (vaheajad.size() >= 2) {
-            for (Long aLong : vaheajad) {
-                koguAeg += aLong;
-            }
-        } else {
-            koguAeg = vaheajad.get(0);
-        }
-        return koguAeg;
+        return andmed;
     }
 
     public static void failid() throws IOException {

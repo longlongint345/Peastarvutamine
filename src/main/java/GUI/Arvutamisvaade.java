@@ -6,8 +6,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
+
 enum Tehetetuup{
-    LIITLAHTUAMINE,
+    LIITLAHUTAMINE,
     JUHUTEHE,
     LIITMINE,
     LAHUTAMINE,
@@ -20,15 +23,19 @@ public class Arvutamisvaade {
     private Tehetetuup tehetetuup;
     private Tehe tehe;
     private static String vastatav = "";
+    private Stat HV = new Stat(statistikaTuup.HEADJAVEAD, "headjavead.txt");
+    private Stat AK = new Stat(statistikaTuup.AJAKULU, "ajakulu.txt");
+
+
     //private boolean kasKumnendmurrud;
     Liitmistehe liitmistehe = new Liitmistehe();
     Lahutamistehe lahutamine = new Lahutamistehe();
     Korrutamistehe korrutamine = new Korrutamistehe();
     Jagamistehe jagamine = new Jagamistehe();
 
-    public Arvutamisvaade(BorderPane borderPane) {
+    public Arvutamisvaade(BorderPane borderPane) throws IOException {
         this.borderPane = borderPane;
-
+        Stat.failid();
     }
 
     public void setKasKumnendmurrud(boolean kasKumnendmurrud) {
@@ -47,10 +54,11 @@ public class Arvutamisvaade {
         korrutamine.setRaskusaste(raskusaste);
         jagamine.setRaskusaste(raskusaste);
     }
-    private Tehe annaTehe(Tehetetuup tehetetuup){
+
+    private Tehe annaTehe(Tehetetuup tehetetuup) {
 
         int suvaline;
-        switch (tehetetuup){
+        switch (tehetetuup) {
             case LIITMINE:
                 return this.liitmistehe;
             case LAHUTAMINE:
@@ -59,11 +67,11 @@ public class Arvutamisvaade {
                 return this.korrutamine;
             case JAGAMINE:
                 return this.jagamine;
-            case LIITLAHTUAMINE:
+            case LIITLAHUTAMINE:
                 suvaline = Main.loos(2);
-                if (suvaline == 1){
+                if (suvaline == 1) {
                     return this.liitmistehe;
-                }else{
+                } else {
                     return this.lahutamine;
                 }
             case JUHUTEHE:
@@ -77,11 +85,13 @@ public class Arvutamisvaade {
         return null;
     }
 
-    public void kuva(){
+    public void kuva() {
         // todo Võimalus klaviatuurilt sisestada?
+
         GridPane arvutamisvaadeGridPane = new GridPane();
         assert tehe != null;
         tehe.genTehe();
+        AtomicLong start = new AtomicLong(System.currentTimeMillis());
         Label teheLabel = new Label(tehe.getTehe());
         HBox tehtevaliHbox = new HBox();
         tehtevaliHbox.getChildren().add(teheLabel);
@@ -106,13 +116,13 @@ public class Arvutamisvaade {
 
         teheLabel.setFont(tehteFont);
 
-        for (int i = 0; i <= 9; i++){
+        for (int i = 0; i <= 9; i++) {
             numbrinupud[i].setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             numbrinupud[i].setFont(nupufont);
             int finalI = i;
             numbrinupud[i].setOnMouseClicked(e -> {
                 vastatav += Integer.toString(finalI);
-                teheLabel.setText(teheLabel.getText()+finalI);
+                teheLabel.setText(teheLabel.getText() + finalI);
             });
         }
 
@@ -133,33 +143,51 @@ public class Arvutamisvaade {
             if (vastatav.equals("")) vastatav = "-";
             else if (vastatav.charAt(0) != '-') vastatav = "-" + vastatav;
             else vastatav = vastatav.substring(1);
-            teheLabel.setText(tehe.getTehe()+vastatav);
+            teheLabel.setText(tehe.getTehe() + vastatav);
         });
         nuppTagasi.setOnMouseClicked(e -> {
             if (!vastatav.equals("")) {
-                vastatav = vastatav.substring(0, vastatav.length()-1);
+                vastatav = vastatav.substring(0, vastatav.length() - 1);
                 teheLabel.setText(tehe.getTehe() + vastatav);
             }
         });
         nuppKoma.setOnMouseClicked(e -> {
-            if(!vastatav.equals("") && !vastatav.contains(",") && !vastatav.equals("-")){
+            if (!vastatav.equals("") && !vastatav.contains(",") && !vastatav.equals("-")) {
                 vastatav += ",";
                 teheLabel.setText(tehe.getTehe() + vastatav);
             }
         });
         nuppVasta.setOnMouseClicked(e -> {
             if (!vastatav.equals("") && !vastatav.equals("-")) {
-                double pakkumine = Double.parseDouble(vastatav.replace(",", "."));
-                if (tehe.kontrolliVastus(pakkumine)) {
-                    tehtevaliHbox.setStyle("-fx-background-color: #F4F4F4;");
-                    tehe = annaTehe(tehetetuup);
-                    assert tehe != null;
-                    tehe.genTehe();
-                }else{
-                    tehtevaliHbox.setStyle("-fx-background-color: #FF0000;");
+                try {
+                    double pakkumine = Double.parseDouble(vastatav.replace(",", "."));
+                    if (tehe.kontrolliVastus(pakkumine)) {
+                        AK.setAeg(System.currentTimeMillis() - start.get());
+                        AK.lisaAndmed(true);
+                        HV.lisaAndmed(true);
+                        start.set(System.currentTimeMillis());
+                        tehtevaliHbox.setStyle("-fx-background-color: #F4F4F4;");
+                        tehe = annaTehe(tehetetuup);
+                        assert tehe != null;
+                        tehe.genTehe();
+                    } else {
+                        tehtevaliHbox.setStyle("-fx-background-color: #FF0000;");
+                        AK.setAeg(System.currentTimeMillis() - start.get());
+                        AK.lisaAndmed(false);
+                        HV.lisaAndmed(false);
+                        start.set(System.currentTimeMillis());
+                    }
+                    vastatav = "";
+                    teheLabel.setText(tehe.getTehe());
+
+                } catch (IOException ex) {
+                    System.out.println("Andmefaili(de)ga juhtus tõrge.");
+                    try {
+                        Stat.failid();
+                    } catch (IOException exc) {
+                        System.out.println("Andmefaile ei saanud taasluua, programm sulgub.");
+                    }
                 }
-                vastatav = "";
-                teheLabel.setText(tehe.getTehe());
             }
         });
 
@@ -167,34 +195,32 @@ public class Arvutamisvaade {
         RowConstraints ridaConstraint = new RowConstraints();
         ridaConstraint.setPercentHeight(25);
         tulpConstraint.setPercentWidth(20);
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             arvutamisvaadeGridPane.getColumnConstraints().add(tulpConstraint);
             arvutamisvaadeGridPane.getRowConstraints().add(ridaConstraint);
         }
         arvutamisvaadeGridPane.getColumnConstraints().add(tulpConstraint);
 
-        arvutamisvaadeGridPane.add(tehtevaliHbox,0,0, 5, 1);
-        arvutamisvaadeGridPane.add(numbrinupud[7], 0,1, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[8], 1,1, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[9], 2,1, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[4], 0,2, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[5], 1,2, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[6], 2,2, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[1], 0,3, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[2], 1,3, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[3], 2,3, 1,1);
-        arvutamisvaadeGridPane.add(numbrinupud[0], 3,3, 1,1);
-        arvutamisvaadeGridPane.add(nuppKoma, 4, 3, 1,1);
-        arvutamisvaadeGridPane.add(nuppNeg, 3,2, 1,1);
-        arvutamisvaadeGridPane.add(nuppTagasi, 4,2, 1,1);
-        arvutamisvaadeGridPane.add(nuppVasta, 3,1, 2,1);
+        arvutamisvaadeGridPane.add(tehtevaliHbox, 0, 0, 5, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[7], 0, 1, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[8], 1, 1, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[9], 2, 1, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[4], 0, 2, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[5], 1, 2, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[6], 2, 2, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[1], 0, 3, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[2], 1, 3, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[3], 2, 3, 1, 1);
+        arvutamisvaadeGridPane.add(numbrinupud[0], 3, 3, 1, 1);
+        arvutamisvaadeGridPane.add(nuppKoma, 4, 3, 1, 1);
+        arvutamisvaadeGridPane.add(nuppNeg, 3, 2, 1, 1);
+        arvutamisvaadeGridPane.add(nuppTagasi, 4, 2, 1, 1);
+        arvutamisvaadeGridPane.add(nuppVasta, 3, 1, 2, 1);
 
         arvutamisvaadeGridPane.setAlignment(Pos.CENTER);
-
-
-
 
 
         borderPane.setCenter(arvutamisvaadeGridPane);
     }
 }
+

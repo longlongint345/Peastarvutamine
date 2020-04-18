@@ -11,15 +11,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.Random;
 
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage peaLava) {
+    public void start(Stage peaLava) throws IOException {
         BorderPane borderPane = new BorderPane();
         Arvutamisvaade arvutamisvaade = new Arvutamisvaade(borderPane);
+        JuhisteVaade juhised = new JuhisteVaade(borderPane);
 
         // Menüüriba
         MenuBar menuBar = new MenuBar();
@@ -40,16 +42,19 @@ public class Main extends Application {
 
         Menu statMenu = new Menu("Statistika");
             MenuItem kuvaStatMenuItem = new MenuItem("Kuva statistika");
-            kuvaStatMenuItem.setOnAction(event -> borderPane.setCenter(new Label("Statistikavaade")));
-            MenuItem laadiMenuItem = new MenuItem("Loe statistika");
-            laadiMenuItem.setOnAction(e -> borderPane.setCenter(new Label("Äkki see nupp võiks lugeda zip failist statistika (statistika importimine)?")));
-            MenuItem salvestaMenuItem = new MenuItem("Salvesta statistika");
-            salvestaMenuItem.setOnAction(e -> borderPane.setCenter(new Label("Äkki see nupp võiks luua mingi zip faili (statistika eksportimine)?")));
-            statMenu.getItems().addAll(kuvaStatMenuItem, laadiMenuItem, salvestaMenuItem);
+            kuvaStatMenuItem.setOnAction(event -> {
+                try {
+                    Statistikavaade statistikavaade = new Statistikavaade(borderPane);
+                    statistikavaade.kuva();
+                } catch (IOException e) {
+                    System.out.println("Ei saanud vaadet kuvada.");
+                }
+            });
+            statMenu.getItems().addAll(kuvaStatMenuItem);
 
         Menu abiMenu = new Menu("Abi");
             MenuItem juhendMenuItem = new MenuItem("Juhised");
-            juhendMenuItem.setOnAction(e -> borderPane.setCenter(new Label("Programmi kasutamise juhend")));
+            juhendMenuItem.setOnAction(e -> juhised.kuva());
             MenuItem infoMenuItem = new MenuItem("Info");
             infoMenuItem.setOnAction(e -> borderPane.setCenter(new Label("Versioon 1.0\n\nProgrammi autorid on Andre Anijärv ja Patrik Pruunsild.")));
             abiMenu.getItems().addAll(juhendMenuItem, infoMenuItem);
@@ -57,13 +62,12 @@ public class Main extends Application {
 
         borderPane.setTop(menuBar);
 
-
         kuvaReziimivalikud(arvutamisvaade, borderPane);
 
 
         // jalus
         HBox jalusHbox = new HBox();
-        jalusHbox.getChildren().add(new Label("Mingid asjalikud tekstid neile, kes juhendit ei viitsi lugeda / Koduekraanile saab alati tagasi, kui valida File -> Vali režiim"));
+        jalusHbox.getChildren().add(new Label("Koduekraanile saab tagasi, kui valida Fail -> Vali režiim"));
         jalusHbox.setAlignment(Pos.CENTER);
         jalusHbox.setPrefHeight(30);
         borderPane.setBottom(jalusHbox);
@@ -80,6 +84,7 @@ public class Main extends Application {
      * @param arvutamisvaade - et nupud kuhugi viiksid
      * @param borderPane
      */
+
     public static void kuvaReziimivalikud(Arvutamisvaade arvutamisvaade, BorderPane borderPane){
 
         VBox keskmisedelemendidVbox = new VBox();
@@ -103,12 +108,12 @@ public class Main extends Application {
         Label liimineLabel = new Label("Liitmine");
         liitmisvalikudVbox.getChildren().add(liimineLabel);
         Button[] liitmisnupud = new Button[]{
-                new Button("1. kohalised"),
-                new Button("2. kohalised"),
-                new Button("3. kohalised"),
-                new Button("4. kohalised"),
-                new Button("5. kohalised"),
-                new Button("6. kohalised")
+                new Button("1-kohalised"),
+                new Button("2-kohalised"),
+                new Button("3-kohalised"),
+                new Button("4-kohalised"),
+                new Button("5-kohalised"),
+                new Button("6-kohalised")
         };
         seadistaNupud(liitmisnupud,Tehetetuup.LIITMINE,arvutamisvaade);
 
@@ -121,12 +126,12 @@ public class Main extends Application {
         Label lahutamineLabel = new Label("Lahutamine");
         lahutamismisvalikudVbox.getChildren().add(lahutamineLabel);
         Button[] lahutamismisnupud = new Button[]{
-                new Button("1. kohalised"),
-                new Button("2. kohalised"),
-                new Button("3. kohalised"),
-                new Button("4. kohalised"),
-                new Button("5. kohalised"),
-                new Button("6. kohalised")
+                new Button("1-kohalised"),
+                new Button("2-kohalised"),
+                new Button("3-kohalised"),
+                new Button("4-kohalised"),
+                new Button("5-kohalised"),
+                new Button("6-kohalised")
         };
         seadistaNupud(lahutamismisnupud,Tehetetuup.LAHUTAMINE,arvutamisvaade);
 
@@ -139,12 +144,12 @@ public class Main extends Application {
         Label korrutamineLabel = new Label("Korrutamine");
         korrutamismisvalikudVbox.getChildren().add(korrutamineLabel);
         Button[] korrutamisnupud = new Button[]{
-                new Button("1. kohalised"),
-                new Button("2. kohalised"),
-                new Button("3. kohalised"),
-                new Button("4. kohalised"),
-                new Button("5. kohalised"),
-                new Button("6. kohalised")
+                new Button("1-kohalised"),
+                new Button("2-kohalised"),
+                new Button("3-kohalised"),
+                new Button("4-kohalised"),
+                new Button("5-kohalised"),
+                new Button("6-kohalised")
         };
         seadistaNupud(korrutamisnupud,Tehetetuup.KORRUTAMINE,arvutamisvaade);
 
@@ -157,12 +162,12 @@ public class Main extends Application {
         Label jagamisLabel = new Label("Jagamine");
         jagamisvalikudVbox.getChildren().add(jagamisLabel);
         Button[] jagamisnupud = new Button[]{
-                new Button("1. kohalised"),
-                new Button("2. kohalised"),
-                new Button("3. kohalised"),
-                new Button("4. kohalised"),
-                new Button("5. kohalised"),
-                new Button("6. kohalised")
+                new Button("1-kohalised"),
+                new Button("2-kohalised"),
+                new Button("3-kohalised"),
+                new Button("4-kohalised"),
+                new Button("5-kohalised"),
+                new Button("6-kohalised")
         };
         seadistaNupud(jagamisnupud,Tehetetuup.JAGAMINE,arvutamisvaade);
 
@@ -175,14 +180,14 @@ public class Main extends Application {
         Label liitlahutamisLabel = new Label("Liitlahutamine");
         liitlahutamiseValikudVbox.getChildren().add(liitlahutamisLabel);
         Button[] liitlahutamisnupud = new Button[]{
-                new Button("1. kohalised"),
-                new Button("2. kohalised"),
-                new Button("3. kohalised"),
-                new Button("4. kohalised"),
-                new Button("5. kohalised"),
-                new Button("6. kohalised")
+                new Button("1-kohalised"),
+                new Button("2-kohalised"),
+                new Button("3-kohalised"),
+                new Button("4-kohalised"),
+                new Button("5-kohalised"),
+                new Button("6-kohalised")
         };
-        seadistaNupud(liitlahutamisnupud,Tehetetuup.LIITLAHTUAMINE,arvutamisvaade);
+        seadistaNupud(liitlahutamisnupud,Tehetetuup.LIITLAHUTAMINE,arvutamisvaade);
 
         liitlahutamiseValikudVbox.getChildren().addAll(liitlahutamisnupud);
         liitlahutamiseValikudVbox.setSpacing(5);
@@ -193,12 +198,12 @@ public class Main extends Application {
         Label juhutehteLabel = new Label("Juhutehe");
         juhutehteValikudVbox.getChildren().add(juhutehteLabel);
         Button[] juhutehtenupud = new Button[]{
-                new Button("1. kohalised"),
-                new Button("2. kohalised"),
-                new Button("3. kohalised"),
-                new Button("4. kohalised"),
-                new Button("5. kohalised"),
-                new Button("6. kohalised")
+                new Button("1-kohalised"),
+                new Button("2-kohalised"),
+                new Button("3-kohalised"),
+                new Button("4-kohalised"),
+                new Button("5-kohalised"),
+                new Button("6-kohalised")
         };
         seadistaNupud(juhutehtenupud,Tehetetuup.JUHUTEHE,arvutamisvaade);
 
@@ -229,7 +234,8 @@ public class Main extends Application {
             });
         }
     }
-    public static void main(String[] args) {
+
+    public static void main(String[] args)  {
         launch(args);
     }
     public static int loos(int ulatus) {

@@ -1,8 +1,7 @@
 package GUI;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -81,14 +80,27 @@ public class Statistikavaade {
         Button kustutaAndmed = new Button("Andmete kustutamiseks vajuta siia");
         kustutaAndmed.setFont(new Font("Verdana",12));
         kustutaAndmed.setOnMouseClicked(e -> {
-            try {
-                Stat.failidTuhjaks();
-                täpsusAndmed[0] = 0;
-                täpsusAndmed[1] = 0;
-                keskmiseAjaAndmed[0] = 0;
-                kuva();
-            } catch (IOException io) {
-                kustutaAndmed.setText("Midagi läks valesti.");
+            if (!(täpsusAndmed[0] == 0) && !(täpsusAndmed[1] == 0) && !(keskmiseAjaAndmed[0] == 0)) {
+                ButtonType jah = new ButtonType("Jah", ButtonBar.ButtonData.OK_DONE);
+                ButtonType ei = new ButtonType("Ei", ButtonBar.ButtonData.CANCEL_CLOSE);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Oled kindel, et soovid andmed kustutada?",jah, ei);
+                alert.setHeaderText("Tähelepanu!");
+                alert.showAndWait();
+                if (alert.getResult() == jah) {
+                    try {
+                        Stat.failidTuhjaks();
+                        täpsusAndmed[0] = 0;
+                        täpsusAndmed[1] = 0;
+                        keskmiseAjaAndmed[0] = 0;
+                        kuva();
+                    } catch (IOException io) {
+                        kustutaAndmed.setText("Midagi läks valesti.");
+                    }
+                }
+            } else {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText("Sul ei ole andmeid, mida kustutada!");
+                a.show();
             }
         });
 

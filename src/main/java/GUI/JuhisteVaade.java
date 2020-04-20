@@ -35,8 +35,9 @@ public class JuhisteVaade {
                 "Kui soovid, et etteantud tehte vastus sisaldaks kümnendmurde, vali Sätted -> Soovin kümnendmurde. Kümnend-\n" +
                 "murdude valiku eemaldamiseks pead Sätete alt Soovin kümnendmurde eest linnukese ära võtma.\n\n" +
                 "Statistika nägemiseks ja kustutamiseks vali menüüribalt Statistika -> Kuva statistika.\n\n" +
+                "Õige vastuse kuvamiseks arvutamisel vajutage tühikut.\n\n" +
                 "Tekkinud probleemide korral saata meil\n" +
-                "Patrikule: patrik_pruunsild@hotmail.com või Andrele: insert mail");
+                "Patrikule: patrik_pruunsild@hotmail.com või Andrele: andre.anijarv@outlook.com");
         juhtnöörid.setFont(new Font("Verdana", 16));
         juhised.getChildren().add(juhtnöörid);
         juhised.setAlignment(Pos.CENTER);

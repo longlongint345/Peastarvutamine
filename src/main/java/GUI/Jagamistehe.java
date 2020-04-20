@@ -4,21 +4,8 @@ import java.text.DecimalFormat;
 
 public class Jagamistehe extends Tehe {
 
-    private boolean raskem;
-
-    // todo Võimalik edasiarendus: kümnendmurdude võimaluse saaks lisada ka liitmisele, lahutamisele ja korrutamisele
-    public void setRaskem(boolean raskem) {
-        // jagamise raskusastme seadistamine
-        this.raskem = raskem;
-    }
-
     @Override
-    public void genTehe() {
-        if (raskem) genRaskem();
-        else genKergem();
-    }
-
-    private void genKergem() {
+    void genKergem() {
         // Meetod genereerib jagamistehte, milles on ainult täisarvud (kergem variant)
 
         int alampiir = -(int) Math.pow(10, raskusaste) + 1;
@@ -35,8 +22,8 @@ public class Jagamistehe extends Tehe {
         else this.tehe = String.format("%d/%d=", jagatav, arv2);
 
     }
-
-    private void genRaskem() {
+    @Override
+    void genRaskem() {
         // Meetod genereerib jagamistehte, kus võib leiduda ka kümnendmurde (raskem variant)
 
         int alampiir = -(int) Math.pow(10, raskusaste) + 1;

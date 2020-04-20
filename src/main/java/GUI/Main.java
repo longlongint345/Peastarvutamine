@@ -67,7 +67,7 @@ public class Main extends Application {
 
         // jalus
         HBox jalusHbox = new HBox();
-        jalusHbox.getChildren().add(new Label("Koduekraanile saab tagasi, kui valida Fail -> Vali režiim"));
+        jalusHbox.getChildren().add(new Label("Koduekraanile saab tagasi, kui valida Fail -> Vali režiim / Vastuse kuvamiseks vajutada tühikut"));
         jalusHbox.setAlignment(Pos.CENTER);
         jalusHbox.setPrefHeight(30);
         borderPane.setBottom(jalusHbox);
@@ -239,6 +239,7 @@ public class Main extends Application {
         launch(args);
     }
     public static int loos(int ulatus) {
+        if (ulatus < 1) return 0;
         // Antud: int ulatus (see näitab mitu võimalikku loosi tulemust saab olla)
         // Tagastab täisarvu lõigust [1, ulatus]
         Random random = new Random();

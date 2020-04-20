@@ -6,11 +6,15 @@ public abstract class Tehe {
     int raskusaste;
     double vastus;
     String tehe;
+    boolean raskem;
 
-    public abstract void genTehe();
+    public void genTehe(){
+        if (raskem) genRaskem();
+        else genKergem();
+    }
 
     public boolean kontrolliVastus(double pakkumine) {
-        return pakkumine == vastus;
+        return Math.abs(pakkumine - vastus) < 0.000001;
     }
 
     public void setRaskusaste(int raskusaste) {
@@ -33,4 +37,12 @@ public abstract class Tehe {
     public int getRaskusaste() {
         return raskusaste;
     }
+    public boolean getRaskus(){
+        return raskem;
+    }
+    public void setRaskem(boolean raskem){
+        this.raskem = raskem;
+    }
+    abstract void genKergem();
+    abstract void genRaskem();
 }

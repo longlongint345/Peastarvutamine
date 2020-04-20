@@ -1,12 +1,17 @@
 package GUI;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.concurrent.atomic.AtomicLong;
 
 enum Tehetetuup{
@@ -25,6 +30,7 @@ public class Arvutamisvaade {
     private static String vastatav = "";
     private Stat HV = new Stat(statistikaTuup.HEADJAVEAD, "headjavead.txt");
     private Stat AK = new Stat(statistikaTuup.AJAKULU, "ajakulu.txt");
+    private boolean teheKuvatud;
 
 
     //private boolean kasKumnendmurrud;
@@ -34,12 +40,15 @@ public class Arvutamisvaade {
     Jagamistehe jagamine = new Jagamistehe();
 
     public Arvutamisvaade(BorderPane borderPane) throws IOException {
+        teheKuvatud = false;
         this.borderPane = borderPane;
         Stat.failid();
     }
 
     public void setKasKumnendmurrud(boolean kasKumnendmurrud) {
-        //this.kasKumnendmurrud = kasKumnendmurrud; // tulevikus saaks laiendada kõikidele tehetele, mitte ainult jagamisele
+        liitmistehe.setRaskem(kasKumnendmurrud);
+        lahutamine.setRaskem(kasKumnendmurrud);
+        korrutamine.setRaskem(kasKumnendmurrud);
         jagamine.setRaskem(kasKumnendmurrud);
     }
 
@@ -86,7 +95,6 @@ public class Arvutamisvaade {
     }
 
     public void kuva() {
-        // todo Võimalus klaviatuurilt sisestada?
 
         GridPane arvutamisvaadeGridPane = new GridPane();
         assert tehe != null;
@@ -124,6 +132,7 @@ public class Arvutamisvaade {
                 vastatav += Integer.toString(finalI);
                 teheLabel.setText(teheLabel.getText() + finalI);
             });
+
         }
 
         Button nuppNeg = new Button("+/-");
@@ -158,37 +167,7 @@ public class Arvutamisvaade {
             }
         });
         nuppVasta.setOnMouseClicked(e -> {
-            if (!vastatav.equals("") && !vastatav.equals("-")) {
-                try {
-                    double pakkumine = Double.parseDouble(vastatav.replace(",", "."));
-                    if (tehe.kontrolliVastus(pakkumine)) {
-                        AK.setAeg(System.currentTimeMillis() - start.get());
-                        AK.lisaAndmed(true);
-                        HV.lisaAndmed(true);
-                        start.set(System.currentTimeMillis());
-                        tehtevaliHbox.setStyle("-fx-background-color: #F4F4F4;");
-                        tehe = annaTehe(tehetetuup);
-                        assert tehe != null;
-                        tehe.genTehe();
-                    } else {
-                        tehtevaliHbox.setStyle("-fx-background-color: #FF0000;");
-                        AK.setAeg(System.currentTimeMillis() - start.get());
-                        AK.lisaAndmed(false);
-                        HV.lisaAndmed(false);
-                        start.set(System.currentTimeMillis());
-                    }
-                    vastatav = "";
-                    teheLabel.setText(tehe.getTehe());
-
-                } catch (IOException ex) {
-                    System.out.println("Andmefaili(de)ga juhtus tõrge.");
-                    try {
-                        Stat.failid();
-                    } catch (IOException exc) {
-                        System.out.println("Andmefaile ei saanud taasluua, programm sulgub.");
-                    }
-                }
-            }
+            vasta(start, tehtevaliHbox, teheLabel);
         });
 
         ColumnConstraints tulpConstraint = new ColumnConstraints();
@@ -219,8 +198,90 @@ public class Arvutamisvaade {
 
         arvutamisvaadeGridPane.setAlignment(Pos.CENTER);
 
+        // võimalus sisestadada klaviatuurilt
+        arvutamisvaadeGridPane.addEventFilter(KeyEvent.ANY, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getEventType() == KeyEvent.KEY_PRESSED) {
+                    String tipitud = "";
+                    if (event.getCode() == KeyCode.DIGIT1 || event.getCode() == KeyCode.NUMPAD1) tipitud = "1";
+                    else if (event.getCode() == KeyCode.DIGIT2 || event.getCode() == KeyCode.NUMPAD2) tipitud = "2";
+                    else if (event.getCode() == KeyCode.DIGIT3 || event.getCode() == KeyCode.NUMPAD3) tipitud = "3";
+                    else if (event.getCode() == KeyCode.DIGIT4 || event.getCode() == KeyCode.NUMPAD4) tipitud = "4";
+                    else if (event.getCode() == KeyCode.DIGIT5 || event.getCode() == KeyCode.NUMPAD5) tipitud = "5";
+                    else if (event.getCode() == KeyCode.DIGIT6 || event.getCode() == KeyCode.NUMPAD6) tipitud = "6";
+                    else if (event.getCode() == KeyCode.DIGIT7 || event.getCode() == KeyCode.NUMPAD7) tipitud = "7";
+                    else if (event.getCode() == KeyCode.DIGIT8 || event.getCode() == KeyCode.NUMPAD8) tipitud = "8";
+                    else if (event.getCode() == KeyCode.DIGIT9 || event.getCode() == KeyCode.NUMPAD9) tipitud = "9";
+                    else if (event.getCode() == KeyCode.DIGIT0 || event.getCode() == KeyCode.NUMPAD0) tipitud = "0";
+                    if (event.getCode().isDigitKey()) {
+                        vastatav += tipitud;
+                        teheLabel.setText(teheLabel.getText() + tipitud);
+                    } else if (event.getCode() == KeyCode.ENTER) {
+                        vasta(start, tehtevaliHbox, teheLabel);
+                    } else if (event.getCode() == KeyCode.BACK_SPACE) {
+                        if (!vastatav.equals("")) {
+                            vastatav = vastatav.substring(0, vastatav.length() - 1);
+                            teheLabel.setText(tehe.getTehe() + vastatav);
+                        }
+                    }else if(event.getCode() == KeyCode.MINUS || event.getCode() == KeyCode.SUBTRACT || event.getCode() == KeyCode.ADD){
+                        if (vastatav.equals("")) vastatav = "-";
+                        else if (vastatav.charAt(0) != '-') vastatav = "-" + vastatav;
+                        else vastatav = vastatav.substring(1);
+                        teheLabel.setText(tehe.getTehe() + vastatav);
+                    }else if (event.getCode() == KeyCode.COMMA || event.getCode() == KeyCode.DECIMAL){
+                        if (!vastatav.equals("") && !vastatav.contains(",") && !vastatav.equals("-")) {
+                            vastatav += ",";
+                            teheLabel.setText(tehe.getTehe() + vastatav);
+                        }
+                    }else if (event.getCode() == KeyCode.SPACE){
+                        if (tehe.getRaskus()) teheLabel.setText(String.format(tehe.getTehe() + "%.4f", tehe.getVastus()));
+                        else teheLabel.setText(String.format(tehe.getTehe() + "%.0f", tehe.getVastus()));
+                        vastatav = Double.toString(tehe.getVastus());
+                        teheKuvatud = true;
+                    }
+                }
+            }
+        });
 
         borderPane.setCenter(arvutamisvaadeGridPane);
+    }
+    // koodi kokkuhoid, meetod kasutatud nii nupule vajutades, kui klaviatuuril tippides
+    // meetod sisaldab koodi, mis käivitub kui kasutaja otsustab tehet vastata
+    public void vasta(AtomicLong start, HBox tehtevaliHbox, Label teheLabel){
+        if (!vastatav.equals("") && !vastatav.equals("-")) {
+            try {
+                double pakkumine = Double.parseDouble(vastatav.replace(",", "."));
+                if (tehe.kontrolliVastus(pakkumine)) {
+                    AK.setAeg(System.currentTimeMillis() - start.get());
+                    AK.lisaAndmed(!teheKuvatud);
+                    HV.lisaAndmed(!teheKuvatud);
+                    start.set(System.currentTimeMillis());
+                    tehtevaliHbox.setStyle("-fx-background-color: #F4F4F4;");
+                    tehe = annaTehe(tehetetuup);
+                    assert tehe != null;
+                    tehe.genTehe();
+                } else {
+                    tehtevaliHbox.setStyle("-fx-background-color: #FF0000;");
+                    AK.setAeg(System.currentTimeMillis() - start.get());
+                    AK.lisaAndmed(false);
+                    HV.lisaAndmed(false);
+                    start.set(System.currentTimeMillis());
+                }
+                vastatav = "";
+                teheLabel.setText(tehe.getTehe());
+
+            } catch (IOException ex) {
+                System.out.println("Andmefaili(de)ga juhtus tõrge.");
+                try {
+                    Stat.failid();
+                } catch (IOException exc) {
+                    System.out.println("Andmefaile ei saanud taasluua, programm sulgub.");
+                    System.exit(1);
+                }
+            }
+            teheKuvatud = false;
+        }
     }
 }
 

@@ -82,7 +82,7 @@ public class Main extends Application {
     /**
      * Meetod kuvab etteantud borderpane'i keskele arvutamise režiimi valikud (ning annab ka nuppudele funktsionaalsuse)
      * @param arvutamisvaade - et nupud kuhugi viiksid
-     * @param borderPane
+     * @param borderPane - borderpane
      */
 
     public static void kuvaReziimivalikud(Arvutamisvaade arvutamisvaade, BorderPane borderPane){
@@ -239,7 +239,7 @@ public class Main extends Application {
         launch(args);
     }
     public static int loos(int ulatus) {
-        if (ulatus < 1) return 0;
+        if (ulatus < 1) return 0; // erijuht
         // Antud: int ulatus (see näitab mitu võimalikku loosi tulemust saab olla)
         // Tagastab täisarvu lõigust [1, ulatus]
         Random random = new Random();

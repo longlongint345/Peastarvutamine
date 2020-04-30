@@ -32,7 +32,7 @@ public class JuhisteVaade {
         Text juhtnöörid = new Text("Tere, hea kasutaja!\n\n" +
                 "Arvutamise alustamiseks vali Fail -> Vali režiim, vali endale sobivast arvutustüübist raskusaste vajutades nupule.\n" +
                 "Näiteks veerust 'Liitmine' vajutades nupule '2-kohalised'.\n\n" +
-                "Kui soovid, et etteantud tehte vastus sisaldaks kümnendmurde, vali Sätted -> Soovin kümnendmurde. Kümnend-\n" +
+                "Kui soovid, et etteantud tehe sisaldaks kümnendmurde, vali Sätted -> Soovin kümnendmurde. Kümnend-\n" +
                 "murdude valiku eemaldamiseks pead Sätete alt Soovin kümnendmurde eest linnukese ära võtma.\n\n" +
                 "Statistika nägemiseks ja kustutamiseks vali menüüribalt Statistika -> Kuva statistika.\n\n" +
                 "Õige vastuse kuvamiseks arvutamisel vajutage tühikut.\n\n" +

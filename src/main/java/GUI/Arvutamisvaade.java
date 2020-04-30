@@ -1,6 +1,5 @@
 package GUI;
 
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -9,9 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-
 import java.io.IOException;
-import java.security.Key;
 import java.util.concurrent.atomic.AtomicLong;
 
 enum Tehetetuup{
@@ -32,12 +29,10 @@ public class Arvutamisvaade {
     private Stat AK = new Stat(statistikaTuup.AJAKULU, "ajakulu.txt");
     private boolean teheKuvatud;
 
-
-    //private boolean kasKumnendmurrud;
-    Liitmistehe liitmistehe = new Liitmistehe();
-    Lahutamistehe lahutamine = new Lahutamistehe();
-    Korrutamistehe korrutamine = new Korrutamistehe();
-    Jagamistehe jagamine = new Jagamistehe();
+    private Liitmistehe liitmistehe = new Liitmistehe();
+    private Lahutamistehe lahutamine = new Lahutamistehe();
+    private Korrutamistehe korrutamine = new Korrutamistehe();
+    private Jagamistehe jagamine = new Jagamistehe();
 
     public Arvutamisvaade(BorderPane borderPane) throws IOException {
         teheKuvatud = false;
@@ -65,7 +60,7 @@ public class Arvutamisvaade {
     }
 
     private Tehe annaTehe(Tehetetuup tehetetuup) {
-
+    // meetod tagastab režiimile vastava tehte
         int suvaline;
         switch (tehetetuup) {
             case LIITMINE:
@@ -95,7 +90,7 @@ public class Arvutamisvaade {
     }
 
     public void kuva() {
-
+        // meetod kuvab arvutamisvaate
         GridPane arvutamisvaadeGridPane = new GridPane();
         assert tehe != null;
         tehe.genTehe();

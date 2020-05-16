@@ -3,10 +3,10 @@ package GUI;
 import java.util.Random;
 
 public abstract class Tehe {
-    int raskusaste;
-    double vastus;
-    String tehe;
-    boolean raskem;
+    private int raskusaste;
+    private double vastus;
+    private String tehe;
+    private boolean raskem;
 
     public void genTehe(){
         if (raskem) genRaskem();
@@ -43,6 +43,15 @@ public abstract class Tehe {
     public void setRaskem(boolean raskem){
         this.raskem = raskem;
     }
+
+    public void setVastus(double vastus) {
+        this.vastus = vastus;
+    }
+
+    public void setTehe(String tehe) {
+        this.tehe = tehe;
+    }
+
     abstract void genKergem();
     abstract void genRaskem();
 }

@@ -47,6 +47,13 @@ public class Arvutamisvaade {
         jagamine.setRaskem(kasKumnendmurrud);
     }
 
+    public void setNegatiivsedArvud(boolean kasNeg){
+        liitmistehe.setNegatiivsedArvud(kasNeg);
+        lahutamine.setNegatiivsedArvud(kasNeg);
+        korrutamine.setNegatiivsedArvud(kasNeg);
+        jagamine.setNegatiivsedArvud(kasNeg);
+    }
+
     public void setTehetetuup(Tehetetuup tehetetuup) {
         this.tehetetuup = tehetetuup;
         this.tehe = annaTehe(tehetetuup);

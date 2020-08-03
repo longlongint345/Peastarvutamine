@@ -7,10 +7,19 @@ public abstract class Tehe {
     private double vastus;
     private String tehe;
     private boolean raskem;
+    private boolean negatiivsedArvud;
 
     public void genTehe(){
         if (raskem) genRaskem();
         else genKergem();
+    }
+
+    public boolean kasNegatiivsedArvud() {
+        return negatiivsedArvud;
+    }
+
+    public void setNegatiivsedArvud(boolean negatiivsedArvud) {
+        this.negatiivsedArvud = negatiivsedArvud;
     }
 
     public boolean kontrolliVastus(double pakkumine) {

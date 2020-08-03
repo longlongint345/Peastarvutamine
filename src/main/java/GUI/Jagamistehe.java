@@ -7,9 +7,12 @@ public class Jagamistehe extends Tehe {
     @Override
     void genKergem() {
         // Meetod genereerib jagamistehte, milles on ainult täisarvud (kergem variant)
-        int raskusaste  = this.getRaskusaste();
-
-        int alampiir = -(int) Math.pow(10, raskusaste) + 1;
+        int raskusaste = this.getRaskusaste();
+        boolean negatiivsus = this.kasNegatiivsedArvud();
+        int alampiir = 0;
+        if (negatiivsus){
+            alampiir = -(int) Math.pow(10, raskusaste) + 1;
+        }
         int ulempiir = (int) Math.pow(10, raskusaste) - 1;
         int arv1 = suvalineInt(alampiir, ulempiir);
         int arv2 = suvalineInt(alampiir, ulempiir);
@@ -27,9 +30,13 @@ public class Jagamistehe extends Tehe {
     void genRaskem() {
         // Meetod genereerib jagamistehte, kus võib leiduda ka kümnendmurde (raskem variant)
         int raskusaste = this.getRaskusaste();
-        int alampiir = -(int) Math.pow(10, raskusaste) + 1;
+        boolean negatiivsus = this.kasNegatiivsedArvud();
+        int alampiir = 0, jagamisAlam = 0;
+        if (negatiivsus) {
+            alampiir = -(int) Math.pow(10, raskusaste) + 1;
+            jagamisAlam = -(int) Math.pow(10, Main.loos(raskusaste - 1)) + 1;
+        }
         int ulempiir = (int) Math.pow(10, raskusaste) - 1;
-        int jagamisAlam = -(int) Math.pow(10, Main.loos(raskusaste - 1)) + 1;
         int jagamisUlem = (int) Math.pow(10, raskusaste + 1) - 1;
 
         double arv1 = suvalineInt(alampiir, ulempiir);

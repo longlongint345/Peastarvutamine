@@ -33,12 +33,14 @@ public class Main extends Application {
             fileMenu.getItems().addAll(valireziimMenuItem, sulgeMenuItem);
 
         Menu sattedMenu = new Menu("Sätted");
+            // kümnendmurdude valiku nupp
             RadioMenuItem kumnendMenuItem = new RadioMenuItem("Soovin kümnendmurde");
-            kumnendMenuItem.setOnAction(e -> {
-                if (kumnendMenuItem.isSelected()) arvutamisvaade.setKasKumnendmurrud(true);
-                else arvutamisvaade.setKasKumnendmurrud(false);
-            });
+            kumnendMenuItem.setOnAction(e -> arvutamisvaade.setKasKumnendmurrud(kumnendMenuItem.isSelected()));
             sattedMenu.getItems().add(kumnendMenuItem);
+            // negatiivsete arvude valiku nupp
+            RadioMenuItem negArvMenuItem = new RadioMenuItem("Soovin negatiivseid arve");
+            negArvMenuItem.setOnAction(e -> arvutamisvaade.setNegatiivsedArvud(negArvMenuItem.isSelected()));
+            sattedMenu.getItems().add(negArvMenuItem);
 
         Menu statMenu = new Menu("Statistika");
             MenuItem kuvaStatMenuItem = new MenuItem("Kuva statistika");
@@ -56,7 +58,7 @@ public class Main extends Application {
             MenuItem juhendMenuItem = new MenuItem("Juhised");
             juhendMenuItem.setOnAction(e -> juhised.kuva());
             MenuItem infoMenuItem = new MenuItem("Info");
-            infoMenuItem.setOnAction(e -> borderPane.setCenter(new Label("Versioon 1.0\n\nProgrammi autorid on Andre Anijärv ja Patrik Pruunsild.")));
+            infoMenuItem.setOnAction(e -> borderPane.setCenter(new Label("Versioon 1.1\n\nProgrammi autorid on Andre Anijärv ja Patrik Pruunsild.")));
             abiMenu.getItems().addAll(juhendMenuItem, infoMenuItem);
         menuBar.getMenus().addAll(fileMenu, sattedMenu, statMenu, abiMenu);
 
